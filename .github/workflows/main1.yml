@@ -1,34 +1,39 @@
-name: Run selenium Script
+name: Run Selenium Script
 
 on:
   schedule:
     - cron: '*/15 15-22 * * *'  # Every 15 minutes from 3pm to 10:45pm UTC
     - cron: '0 23 * * *'        # At 11:00pm UTC
-  workflow_dispatch:
+  workflow_dispatch:             # Allows manual runs from the Actions tab
 
 jobs:
   selenium-job:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Install dependencies
         run: pip install selenium
+
       - name: Install Chrome
         run: |
           sudo apt-get update
           sudo apt-get install -y wget unzip
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
+
       - name: Install ChromeDriver
         run: |
           CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
-          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip"
+          DRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+          wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
           unzip /tmp/chromedriver.zip -d /usr/bin/
           chmod +x /usr/bin/chromedriver
+
       - name: Run script
         run: python autoclm1.py
-
