@@ -1,0 +1,29 @@
+name: Run Selenium Script
+
+on:
+  schedule:
+    - cron: '*/15 15-22 * * *'  # Every 15 minutes from 3pm to 10:45pm UTC
+    - cron: '0 23 * * *'        # At 11:00pm UTC
+  workflow_dispatch:             # Allows manual trigger for testing
+
+jobs:
+  selenium-job:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python dependencies
+        run: pip install selenium
+      
+      - name: Set up Chrome and ChromeDriver
+        uses: browser-actions/setup-chrome@v2
+        with:
+          install-chromedriver: true
+      
+      - name: Run Selenium script
+        run: python autoclm1.py
